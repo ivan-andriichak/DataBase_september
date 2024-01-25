@@ -1,0 +1,97 @@
+// Отримайте всіх студентів
+db.students.find()
+
+// Знайдіть студентів, які вивчають математику
+db.students.find({ lessons: 'mathematics' })
+
+// Знайдіть студентів, які вивчають англійську (перевіряємо перший елемент масиву "lessons")
+db.students.find({ 'lessons.0': 'english' })
+
+// Отримайте всіх студентів, але виведіть лише перші два предмети
+db.students.find({}, { lessons: { $slice: 2 } })
+
+// Знайдіть студентів, які мають лише два предмети
+db.students.find({ lessons: { $size: 2 } })
+
+// Додайте предмет "python" до предметів студента за _id
+db.students.updateOne(
+    { _id: ObjectId('6529700ef69e3d3dd4a3c2cf') },
+    { $push: { lessons: 'python' } }
+)
+
+// Код, який ви ввели закоментований, оскільки він був помилковим, виправив його нижче:
+
+// Додайте предмети "java" та "js" до предметів студента за _id
+db.students.updateOne(
+    { _id: ObjectId('6529700ef69e3d3dd4a3c2cf') },
+    { $push: { lessons: { $each: ['java', 'js'] } }
+)
+
+// Додайте предмети "a", "b" та "c" до предметів студента за _id
+db.students.updateOne(
+    { _id: ObjectId('6529700ef69e3d3dd4a3c2cf') },
+    { $push: { lessons: { $each: ['a', 'b', 'c'] } }
+)
+
+// Видаліть предмет "a" з предметів студента за _id
+db.students.updateOne(
+    { _id: ObjectId('6529700ef69e3d3dd4a3c2cf') },
+    { $pull: { lessons: 'a' } }
+)
+
+// Зніміть значення другого елемента масиву "lessons" за _id
+db.students.updateOne(
+    { _id: ObjectId('6529700ef69e3d3dd4a3c2cf') },
+    { $unset: { 'lessons.1': 1 } }
+)
+
+// Видаліть всі значення "null" з масиву "lessons" за _id
+db.students.updateOne(
+    { _id: ObjectId('6529700ef69e3d3dd4a3c2cf') },
+    { $pull: { lessons: null } }
+)
+
+// Видаліть останній предмет з масиву "lessons" за _id
+db.students.updateOne(
+    { _id: ObjectId('6529700ef69e3d3dd4a3c2cf') },
+    { $pop: { lessons: -1 } }
+)
+
+// Видаліть перший предмет з масиву "lessons" за _id
+db.students.updateOne(
+    { _id: ObjectId('6529700ef69e3d3dd4a3c2cf') },
+    { $pop: { lessons: 1 } }
+)
+
+// Додайте предмет "python" до масиву "lessons" за _id, якщо його там ще немає
+db.students.updateOne(
+    { _id: ObjectId('6529700ef69e3d3dd4a3c2cf') },
+    { $addToSet: { lessons: 'python' } }
+)
+
+// Оновіть професію батьків для всіх студентів, у яких батьки ізначально були не вказані (null)
+db.students.updateMany(
+    {
+        parents: { $exists: 1 },
+        'parents.profession': null
+    },
+    { $set: { 'parents.$[item].profession': 'porn star' } },
+    { arrayFilters: [{ 'item.profession': null }] }
+)
+
+// Знайдіть студентів з менше ніж 3 предметами та виключіть поле "lessonsLength"
+db.students.aggregate([
+    {
+        $addFields: {
+            lessonsLength: {
+                $cond: { if: { $isArray: '$lessons' }, then: { $size: '$lessons' }, else: 0 }
+            }
+        }
+    },
+    {
+        $match: { lessonsLength: { $lt: 3 } }
+    },
+    {
+        $project: { lessonsLength: 0 }
+    }
+])
