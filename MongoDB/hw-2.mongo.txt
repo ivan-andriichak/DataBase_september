@@ -99,10 +99,10 @@ db.students.aggregate([
 db.students.aggregate([
     {
         $match: {
-           $or:[
-               {parents: {$size:0}},
-               {parents: {$size:1}}
-           ]
+            $or:[
+                {parents: {$size:0}},
+                {parents: {$size:1}}
+            ]
         }
     }
 ])

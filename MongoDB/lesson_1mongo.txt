@@ -1,113 +1,126 @@
 
+// Пошук усіх користувачів
 db.users.find()
 
-db.users.insertOne({car: 'BMW', model: 's3', year: 2020})
-db.users.insertMany([
-    {car: 'BMW', model: 's3', year: 2020},
-    {car: 'BMW', model: 's3', year: 2020}
-]
-    )
+// Вставка нового користувача з вказанням автомобіля, моделі та року
+db.users.insertOne({car: "BMW", model: "s3", year: 2020})
 
-db.users.find({_id: ObjectId('65aea9a1b031d02f1b5c7a38')})
+// Пошук користувача за ID
+db.users.find({_id: ObjectId('65b6a0cfd55b803e45fd00a4')})
 
-db.users.find({gender: 'female', rating: 2})
+// Пошук користувачів за статтею та рейтингом, виключаючи ID
+db.users.find({gender: 'female', rating: 2}, {_id: 0})
 
-db.users.find(
-    {gender: 'female', rating: 2},
-    {age: true, _id: 0}
-    )
-
+// Пошук користувачів за декількома рейтингами
 db.users.find({
     $or: [
-        {rating: 2, age: 5},
+        {rating: 2},
         {rating: 5},
-        {age: 12}
+        {rating: 12}
     ]
 })
 
+// Пошук користувачів за статтю і рейтингом
 db.users.find({
     $and: [
-        {age: 12},
-        {gender: 'male'},
+        {gender: 'female'},
         {rating: 2}
     ]
 })
 
-db.users.find({age: {$in: [25, 36, 20, 45]}})
-db.users.find({age: {$nin: [25, 36, 20, 45]}})
+// Пошук користувачів за віком у списку
+db.users.find({age: {$in: [25, 36, 45, 20]}})
+
+// Пошук користувачів за віком у списку (інша структура)
 db.users.find({
     age: {
-        $not: {
-            $in: [[25, 36, 20, 45]]
-        }
+        $in: [25, 36, 45, 20]
     }
 })
 
-db.users.find({rating: {$gt: 2}}) // >
-db.users.find({rating: {$lt: 3}}) // <
-db.users.find({rating: {$gte: 3}}) // >=
-db.users.find({rating: {$lte: 3}}) // <=
-db.users.find({rating: {$ne: 3}}) // !=
-db.users.find({rating: {$eq: 3}}) // ==
-db.users.find({rating: 3}) // ==
+// Пошук користувачів з рейтингом більше заданого
+db.users.find({rating: {$gt: 2}})
 
+// Пошук користувачів з рейтингом менше заданого
+db.users.find({rating: {$lt: 3}})
+
+// Пошук користувачів з рейтингом не рівним заданому
+db.users.find({rating: {$ne: 3}})
+
+// Пошук користувачів за ім'ям
 db.users.find({name: 'Kira'})
+
+// Пошук користувачів з ім'ям, що починається з "a"
 db.users.find({name: /^a/i})
-db.users.find({name: /A$/i})
+
+// Пошук користувачів з ім'ям, що закінчується на "a"
+db.users.find({name: /a$/i})
+
+// Пошук користувачів з ім'ям, у якому є символ "t", який передується будь-якими двома символами
 db.users.find({name: /.{2}t/i})
+
+// Пошук користувачів з ім'ям, яке починається з "k" і закінчується на "a"
 db.users.find({name: /^k.*a$/i})
-db.users.find({name: /.*v.*/i})
 
+// Пошук користувачів, впорядкованих за рейтингом у зростаючому порядку
 db.users.find().sort({rating: 1})
+
+// Пошук користувачів, впорядкованих за рейтингом у спадаючому порядку
 db.users.find().sort({rating: -1})
-db.users.find().sort({rating: -1, name: 1})
-db.users.find().sort({rating: -1, name: 1}).limit(2)
-db.users.find().sort({rating: -1, name: 1}).limit(2).skip(6)
 
+// Пошук користувачів, впорядкованих спочатку за рейтингом у спадаючому порядку, а потім за іменем у спадаючому порядку, і обмеження результатів
+db.users.find().sort({rating: -1, name: -1}).limit(2).skip(2)
 
+// Оновлення рейтингу користувача за ID
 db.users.updateOne(
-    {_id: ObjectId('65aea9a1b031d02f1b5c7a38')},
-    {$set:{rating: 8}}
-    )
+    {_id: ObjectId('65b6a0cfd55b803e45fd00a2')},
+    {$set: {rating: 2}}
+)
 
-db.users.find()
-
+// Оновлення статті користувачів за статтю "male" на "animal"
 db.users.updateMany(
     {gender: 'male'},
     {$set: {gender: 'animal'}}
-    )
+)
 
+// Пошук користувачів за номером будинку в адресі
 db.users.find({"address.house": 25})
-db.users.find({studying: 'java'})
 
+// Пошук користувачів за предметом навчання "js"
+db.users.find({studying: "js"})
 
+// Пошук користувачів, у яких є батьки
 db.users.find({parents: {$exists: 1}})
+
+// Пошук користувачів, у яких немає батьків
 db.users.find({parents: {$exists: 0}})
 
-db.users.find({parents: null})
+// Пошук користувачів, у яких значення "parents" дорівнює null
+db.users.find({parents: {$exists: null}})
 
+// Пошук користувачів, у яких другий предмет навчання - "java"
 db.users.find({'studying.1': 'java'})
 
+// Оновлення усіх користувачів, у яких є батьки, зі значенням "parents" null
 db.users.updateMany(
     {parents: {$exists: 1}},
     {$set: {'parents.$[]': null}}
-    )
+)
 
+// Додавання предмету навчання "python" користувачу за ID
 db.users.updateOne(
     {_id: ObjectId('65aea9a1b031d02f1b5c7a38')},
     {$push: {studying: 'python'}}
-
 )
 
+// Вилучення предмету навчання "css" користувача за ID
 db.users.updateOne(
     {_id: ObjectId('65aea9a1b031d02f1b5c7a38')},
     {$pull: {studying: 'css'}}
+)
 
-    )
-
-db.users.deleteOne({_id:ObjectId('65aeab02b031d02f1b5c7a40')})
-
-
+// Вилучення користувача за ID
+db.users.deleteOne({_id: ObjectId('65aeab02b031d02f1b5c7a40')})
 
 
 
